@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+
+# Virtual environments
+venv/
+cbc/
+.env
+
+# Reports and generated files
+reports/
+*.pdf
+*.txt
+
+# VS Code
+.vscode/
