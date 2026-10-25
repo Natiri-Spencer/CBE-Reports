@@ -1,4 +1,5 @@
 """Canonical CBC score-band rules used by marks and reports."""
+import math
 
 
 GRADE_BANDS = (
@@ -14,7 +15,10 @@ GRADE_BANDS = (
 
 
 def grade_comment(score: float) -> str:
-    """Return the configured band for a score from 0 through 100."""
+    """Grade valid scores using the marks form's nearest-whole-mark rounding."""
+    if not math.isfinite(score) or not 0 <= score <= 100:
+        return "Invalid"
+    score = round(score)
     for minimum, maximum, label in GRADE_BANDS:
         if minimum <= score <= maximum:
             return label

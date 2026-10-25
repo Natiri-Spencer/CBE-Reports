@@ -15,7 +15,12 @@ jobs:
           cache: pip
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -r requirements-dev.txt
+      - run: python -c "import secrets; print('TEST_JWT_KEY=' + secrets.token_urlsafe(48))" >> "$GITHUB_ENV"
       - run: python -m unittest discover -s tests -v
         env:
           ENV: DEV
-          JWT_SECRET_KEY: ci-only-secret
+          JWT_SECRET_KEY: ${{ env.TEST_JWT_KEY }}
+      - run: python scripts/export_openapi.py --check
+        env:
+          ENV: DEV
+          JWT_SECRET_KEY: ${{ env.TEST_JWT_KEY }}

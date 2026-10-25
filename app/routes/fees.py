@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
+from app.core.privacy import stream_pdf
+from fastapi import APIRouter, Depends, HTTPException, Response, Query
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import List, Dict, Optional, Literal
 from io import BytesIO
 from datetime import date
+from uuid import UUID
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from sqlalchemy import func
@@ -12,9 +14,46 @@ from app.core.database import get_db
 from app.core.auth import admin_only
 from app.models.fee import Fee, FeePayment
 from app.models.admin_activity import AdminActivity
+from app.models.learner import Learner
+from app.models.api import Page
+from app.core.idempotency import IdempotencyKey, execute_once
 from app.utils.academic_calendar import TERM_SCHEDULE, current_academic_period, validate_term
 
 router = APIRouter()
+
+
+class TermInfo(BaseModel):
+    term: int
+    months: str
+    instruction_weeks: int
+    holiday_after_weeks: int
+    holiday_after: str
+
+
+class AcademicCalendar(BaseModel):
+    academic_year: int
+    current_term: int
+    terms: list[TermInfo]
+
+
+class FeeSummaryAll(BaseModel):
+    total_learners: int
+    total_required: float
+    total_paid: float
+    total_balance: float
+
+
+class FeeGroupSummary(BaseModel):
+    grade: str | None = None
+    category: str | None = None
+    total_required: float
+    collected: float
+    balance: float
+    num_learners: int
+
+
+class FeeDeleted(BaseModel):
+    message: str
 
 
 def require_term(term: int) -> int:
@@ -41,8 +80,9 @@ def filter_period(query, academic_year: Optional[int], term: Optional[int]):
     return query
 
 class FeeCreate(BaseModel):
-    learner_name: str = Field(..., min_length=1)
-    grade: str = Field(..., min_length=1)
+    model_config = ConfigDict(from_attributes=True, str_strip_whitespace=True, allow_inf_nan=False, extra="forbid")
+    learner_id: UUID
+    grade: str = Field(..., min_length=1, max_length=50)
     academic_year: int = Field(default_factory=lambda: current_academic_period()[0], ge=0, le=2200)
     term: int = Field(default_factory=lambda: current_academic_period()[1], ge=0, le=3)
     pta_required: float = Field(0.0, ge=0)
@@ -51,12 +91,10 @@ class FeeCreate(BaseModel):
     lunch_required: float = Field(0.0, ge=0)
     school_required: float = Field(0.0, ge=0)
 
-    class Config:
-        from_attributes = True
-
 
 class FeeRecord(FeeCreate):
     id: int
+    learner_name: str
     pta_fee: float
     remedials_fee: float
     welfare_fee: float
@@ -68,6 +106,7 @@ class FeeRecord(FeeCreate):
 
 
 class PaymentCreate(BaseModel):
+    model_config = ConfigDict(allow_inf_nan=False, str_strip_whitespace=True, extra="forbid")
     category: Literal["pta", "remedials", "welfare", "lunch", "school"]
     amount: float = Field(..., gt=0)
     payment_date: date
@@ -113,14 +152,23 @@ def calculate_totals(fee: Fee):
 # -------------------------------
 # CRUD Endpoints
 # -------------------------------
-@router.post("", response_model=FeeRecord)
-def create_fee(record: FeeCreate, db: Session = Depends(get_db), _admin=Depends(admin_only)):
+@router.post("", response_model=FeeRecord, operation_id="save_fee")
+def create_fee(record: FeeCreate, idempotency_key: IdempotencyKey, db: Session = Depends(get_db), _admin=Depends(admin_only)):
+    return execute_once(db, _admin.id, "fees:save", idempotency_key, record.model_dump(mode="json"),
+                        lambda: FeeRecord.model_validate(save_fee_record(record, db, _admin)).model_dump(mode="json"))
+
+
+def save_fee_record(record: FeeCreate, db: Session, _admin):
     require_period(record.academic_year, record.term)
-    values = record.dict()
-    values["learner_name"] = record.learner_name.strip()
+    values = record.model_dump()
+    learner = db.get(Learner, str(record.learner_id))
+    if learner is None:
+        raise HTTPException(status_code=404, detail="Learner not found")
+    values["learner_id"] = learner.id
+    values["learner_name"] = learner.name
     values["grade"] = record.grade.strip()
     new_fee = db.query(Fee).filter(
-        Fee.learner_name == values["learner_name"],
+        Fee.learner_id == learner.id,
         Fee.grade == values["grade"],
         Fee.academic_year == record.academic_year,
         Fee.term == record.term,
@@ -148,12 +196,11 @@ def create_fee(record: FeeCreate, db: Session = Depends(get_db), _admin=Depends(
         entity_id=str(new_fee.id),
         description="Created a fee record" if created else "Updated a fee record",
     ))
-    db.commit()
-    db.refresh(new_fee)
+    db.flush()
     return new_fee
 
 
-@router.get("", response_model=List[FeeRecord])
+@router.get("", response_model=List[FeeRecord], operation_id="list_fees")
 def list_fees(
     academic_year: Optional[int] = None,
     term: Optional[int] = None,
@@ -164,25 +211,33 @@ def list_fees(
     return query.order_by(Fee.academic_year.desc(), Fee.term, Fee.grade, Fee.learner_name).all()
 
 
-@router.get("/calendar")
+@router.get("/calendar", response_model=AcademicCalendar, operation_id="get_academic_calendar")
 def academic_calendar(_admin=Depends(admin_only)):
     year, term = current_academic_period()
     return {"academic_year": year, "current_term": term, "terms": TERM_SCHEDULE}
 
 
-@router.put("/{learner_name}/{grade}", response_model=FeeRecord)
-def update_fee(learner_name: str, grade: str, record: FeeCreate, db: Session = Depends(get_db), _admin=Depends(admin_only)):
+@router.put("/records/{fee_id}", response_model=FeeRecord)
+def update_fee(fee_id: int, record: FeeCreate, idempotency_key: IdempotencyKey,
+               db: Session = Depends(get_db), _admin=Depends(admin_only)):
+    return execute_once(db, _admin.id, "fees:update", idempotency_key,
+                        {"fee_id": fee_id, **record.model_dump(mode="json")},
+                        lambda: FeeRecord.model_validate(update_fee_record(fee_id, record, db, _admin)).model_dump(mode="json"))
+
+
+def update_fee_record(fee_id, record, db, _admin):
     require_period(record.academic_year, record.term)
     fee = db.query(Fee).filter(
-        Fee.learner_name == learner_name,
-        Fee.grade == grade,
+        Fee.id == fee_id,
+        Fee.learner_id == str(record.learner_id),
+        Fee.grade == record.grade,
         Fee.academic_year == record.academic_year,
         Fee.term == record.term,
     ).first()
     if not fee:
         raise HTTPException(status_code=404, detail="Learner not found")
 
-    for field, value in record.dict(exclude={"learner_name", "grade"}).items():
+    for field, value in record.model_dump(exclude={"learner_id", "grade"}).items():
         setattr(fee, field, value)
 
     calculate_totals(fee)
@@ -193,21 +248,19 @@ def update_fee(learner_name: str, grade: str, record: FeeCreate, db: Session = D
         entity_id=str(fee.id),
         description="Updated a fee record",
     ))
-    db.commit()
-    db.refresh(fee)
+    db.flush()
     return fee
 
 
-@router.delete("/{learner_name}/{grade}")
+@router.delete("/records/{fee_id}", response_model=FeeDeleted)
 def delete_fee(
-    learner_name: str,
-    grade: str,
+    fee_id: int,
     academic_year: Optional[int] = None,
     term: Optional[int] = None,
     db: Session = Depends(get_db),
     _admin=Depends(admin_only),
 ):
-    query = db.query(Fee).filter(Fee.learner_name == learner_name, Fee.grade == grade)
+    query = db.query(Fee).filter(Fee.id == fee_id)
     if academic_year is not None:
         query = query.filter(Fee.academic_year == academic_year)
     if term is not None:
@@ -228,7 +281,7 @@ def delete_fee(
     db.query(FeePayment).filter(FeePayment.fee_id == matches[0].id).delete(synchronize_session=False)
     db.delete(matches[0])
     db.commit()
-    return {"message": "Learner deleted"}
+    return {"message": "Fee record deleted"}
 
 
 # -------------------------------
@@ -275,7 +328,7 @@ def list_fees_by_category(
 # -------------------------------
 # Summaries
 # -------------------------------
-@router.get("/summary/all")
+@router.get("/summary/all", response_model=FeeSummaryAll)
 def fee_summary_all(
     academic_year: Optional[int] = None,
     term: Optional[int] = None,
@@ -292,7 +345,7 @@ def fee_summary_all(
     }
 
 
-@router.get("/summary/grade/{grade}")
+@router.get("/summary/grade/{grade}", response_model=FeeGroupSummary, response_model_exclude_none=True)
 def fee_summary_by_grade(
     grade: str,
     academic_year: Optional[int] = None,
@@ -311,7 +364,7 @@ def fee_summary_by_grade(
     }
 
 
-@router.get("/summary/category/{category}")
+@router.get("/summary/category/{category}", response_model=FeeGroupSummary, response_model_exclude_none=True)
 def fee_summary_by_category(
     category: str,
     academic_year: Optional[int] = None,
@@ -343,23 +396,31 @@ def fee_summary_by_category(
     }
 
 
-@router.get("/records/{fee_id}/payments", response_model=List[PaymentRecord])
-def list_payments(fee_id: int, db: Session = Depends(get_db), _admin=Depends(admin_only)):
+@router.get("/records/{fee_id}/payments", response_model=Page[PaymentRecord], operation_id="list_payments")
+def list_payments(fee_id: int, limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0),
+                  db: Session = Depends(get_db), _admin=Depends(admin_only)):
     fee = db.query(Fee).filter(Fee.id == fee_id).first()
     if fee is None:
         raise HTTPException(status_code=404, detail="Fee record not found")
-    return db.query(FeePayment).filter(FeePayment.fee_id == fee_id).order_by(
-        FeePayment.payment_date.is_(None), FeePayment.payment_date, FeePayment.id
-    ).all()
+    query = db.query(FeePayment).filter(FeePayment.fee_id == fee_id)
+    return {"items": query.order_by(FeePayment.payment_date.is_(None), FeePayment.payment_date, FeePayment.id).offset(offset).limit(limit).all(),
+            "total": query.count(), "limit": limit, "offset": offset}
 
 
-@router.post("/records/{fee_id}/payments", response_model=PaymentRecord)
+@router.post("/records/{fee_id}/payments", response_model=PaymentRecord, operation_id="record_payment")
 def record_payment(
     fee_id: int,
     record: PaymentCreate,
+    idempotency_key: IdempotencyKey,
     db: Session = Depends(get_db),
     _admin=Depends(admin_only),
 ):
+    return execute_once(db, _admin.id, "payments:create", idempotency_key,
+                        {"fee_id": fee_id, **record.model_dump(mode="json")},
+                        lambda: PaymentRecord.model_validate(save_payment(fee_id, record, db, _admin)).model_dump(mode="json"))
+
+
+def save_payment(fee_id, record, db, _admin):
     fee = db.query(Fee).filter(Fee.id == fee_id).first()
     if fee is None:
         raise HTTPException(status_code=404, detail="Fee record not found")
@@ -389,8 +450,7 @@ def record_payment(
         entity_id=str(payment.id),
         description="Recorded a fee payment",
     ))
-    db.commit()
-    db.refresh(payment)
+    db.flush()
     return payment
 
 
@@ -475,29 +535,13 @@ def render_fee_statement(fee: Fee, payments: List[FeePayment]) -> Response:
 
     pdf.save()
     buffer.seek(0)
-    return Response(
-        content=buffer.getvalue(),
-        media_type="application/pdf",
-        headers={"Content-Disposition": 'attachment; filename="fee_statement.pdf"'},
-    )
+    return stream_pdf(buffer, "fee_statement.pdf")
 
 
-@router.get("/records/{fee_id}/statement.pdf")
+@router.get("/records/{fee_id}/statement.pdf", operation_id="download_fee_statement", response_class=Response,
+            responses={200: {"content": {"application/pdf": {"schema": {"type": "string", "format": "binary"}}}}})
 def fee_statement_by_id(fee_id: int, db: Session = Depends(get_db), _admin=Depends(admin_only)):
     fee = db.query(Fee).filter(Fee.id == fee_id).first()
-    if fee is None:
-        raise HTTPException(status_code=404, detail="Fee record not found")
-    payments = db.query(FeePayment).filter(FeePayment.fee_id == fee.id).order_by(
-        FeePayment.payment_date.is_(None), FeePayment.payment_date, FeePayment.id
-    ).all()
-    return render_fee_statement(fee, payments)
-
-
-@router.get("/{learner_name}/{grade}/statement.pdf")
-def fee_statement(learner_name: str, grade: str, db: Session = Depends(get_db), _admin=Depends(admin_only)):
-    fee = db.query(Fee).filter(Fee.learner_name == learner_name, Fee.grade == grade).order_by(
-        Fee.academic_year.desc(), Fee.term.desc()
-    ).first()
     if fee is None:
         raise HTTPException(status_code=404, detail="Fee record not found")
     payments = db.query(FeePayment).filter(FeePayment.fee_id == fee.id).order_by(

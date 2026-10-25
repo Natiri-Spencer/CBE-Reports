@@ -1,0 +1,3798 @@
+{
+  "components": {
+    "schemas": {
+      "AcademicCalendar": {
+        "properties": {
+          "academic_year": {
+            "title": "Academic Year",
+            "type": "integer"
+          },
+          "current_term": {
+            "title": "Current Term",
+            "type": "integer"
+          },
+          "terms": {
+            "items": {
+              "$ref": "#/components/schemas/TermInfo"
+            },
+            "title": "Terms",
+            "type": "array"
+          }
+        },
+        "required": [
+          "academic_year",
+          "current_term",
+          "terms"
+        ],
+        "title": "AcademicCalendar",
+        "type": "object"
+      },
+      "AcademicStatus": {
+        "properties": {
+          "average_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Score"
+          },
+          "mark_records": {
+            "title": "Mark Records",
+            "type": "integer"
+          },
+          "students_with_marks": {
+            "title": "Students With Marks",
+            "type": "integer"
+          },
+          "students_without_marks": {
+            "title": "Students Without Marks",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "students_with_marks",
+          "students_without_marks",
+          "mark_records",
+          "average_score"
+        ],
+        "title": "AcademicStatus",
+        "type": "object"
+      },
+      "AccountStatus": {
+        "additionalProperties": false,
+        "properties": {
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "is_active"
+        ],
+        "title": "AccountStatus",
+        "type": "object"
+      },
+      "AccountView": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "role",
+          "is_active"
+        ],
+        "title": "AccountView",
+        "type": "object"
+      },
+      "ActivityRecord": {
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "actor": {
+            "title": "Actor",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "actor",
+          "action",
+          "description",
+          "created_at"
+        ],
+        "title": "ActivityRecord",
+        "type": "object"
+      },
+      "AdminDashboard": {
+        "properties": {
+          "academic_period": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Academic Period",
+            "type": "object"
+          },
+          "academic_status": {
+            "$ref": "#/components/schemas/AcademicStatus"
+          },
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "fee_summary": {
+            "$ref": "#/components/schemas/CurrentFeeSummary"
+          },
+          "recent_activity": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityRecord"
+            },
+            "title": "Recent Activity",
+            "type": "array"
+          },
+          "setup_reminders": {
+            "items": {
+              "$ref": "#/components/schemas/SetupReminder"
+            },
+            "title": "Setup Reminders",
+            "type": "array"
+          }
+        },
+        "required": [
+          "academic_period",
+          "counts",
+          "setup_reminders",
+          "academic_status",
+          "fee_summary",
+          "recent_activity"
+        ],
+        "title": "AdminDashboard",
+        "type": "object"
+      },
+      "Body_login": {
+        "properties": {
+          "client_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Id"
+          },
+          "client_secret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "format": "password",
+            "title": "Client Secret"
+          },
+          "grant_type": {
+            "anyOf": [
+              {
+                "pattern": "^password$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grant Type"
+          },
+          "password": {
+            "format": "password",
+            "title": "Password",
+            "type": "string"
+          },
+          "scope": {
+            "default": "",
+            "title": "Scope",
+            "type": "string"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "Body_login",
+        "type": "object"
+      },
+      "CurrentFeeSummary": {
+        "properties": {
+          "academic_year": {
+            "title": "Academic Year",
+            "type": "integer"
+          },
+          "expected": {
+            "title": "Expected",
+            "type": "number"
+          },
+          "learners_with_fee_records": {
+            "title": "Learners With Fee Records",
+            "type": "integer"
+          },
+          "outstanding": {
+            "title": "Outstanding",
+            "type": "number"
+          },
+          "received": {
+            "title": "Received",
+            "type": "number"
+          },
+          "term": {
+            "title": "Term",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "academic_year",
+          "term",
+          "learners_with_fee_records",
+          "expected",
+          "received",
+          "outstanding"
+        ],
+        "title": "CurrentFeeSummary",
+        "type": "object"
+      },
+      "DashboardReport": {
+        "properties": {
+          "academic_year": {
+            "title": "Academic Year",
+            "type": "integer"
+          },
+          "grade_summaries": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/GradeSummary"
+            },
+            "title": "Grade Summaries",
+            "type": "object"
+          },
+          "grades": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/ReportEntry"
+              },
+              "type": "array"
+            },
+            "title": "Grades",
+            "type": "object"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReportEntry"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "school_summary": {
+            "$ref": "#/components/schemas/SchoolSummary"
+          },
+          "term": {
+            "title": "Term",
+            "type": "integer"
+          },
+          "term_schedule": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Schedule"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "academic_year",
+          "term",
+          "term_schedule",
+          "items",
+          "total",
+          "limit",
+          "offset",
+          "grades",
+          "grade_summaries",
+          "school_summary"
+        ],
+        "title": "DashboardReport",
+        "type": "object"
+      },
+      "FeeCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "academic_year": {
+            "maximum": 2200.0,
+            "minimum": 0.0,
+            "title": "Academic Year",
+            "type": "integer"
+          },
+          "grade": {
+            "maxLength": 50,
+            "minLength": 1,
+            "title": "Grade",
+            "type": "string"
+          },
+          "learner_id": {
+            "format": "uuid",
+            "title": "Learner Id",
+            "type": "string"
+          },
+          "lunch_required": {
+            "default": 0.0,
+            "minimum": 0.0,
+            "title": "Lunch Required",
+            "type": "number"
+          },
+          "pta_required": {
+            "default": 0.0,
+            "minimum": 0.0,
+            "title": "Pta Required",
+            "type": "number"
+          },
+          "remedials_required": {
+            "default": 0.0,
+            "minimum": 0.0,
+            "title": "Remedials Required",
+            "type": "number"
+          },
+          "school_required": {
+            "default": 0.0,
+            "minimum": 0.0,
+            "title": "School Required",
+            "type": "number"
+          },
+          "term": {
+            "maximum": 3.0,
+            "minimum": 0.0,
+            "title": "Term",
+            "type": "integer"
+          },
+          "welfare_required": {
+            "default": 0.0,
+            "minimum": 0.0,
+            "title": "Welfare Required",
+            "type": "number"
+          }
+        },
+        "required": [
+          "learner_id",
+          "grade"
+        ],
+        "title": "FeeCreate",
+        "type": "object"
+      },
+      "FeeDeleted": {
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "FeeDeleted",
+        "type": "object"
+      },
+      "FeeGroupSummary": {
+        "properties": {
+          "balance": {
+            "title": "Balance",
+            "type": "number"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "collected": {
+            "title": "Collected",
+            "type": "number"
+          },
+          "grade": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grade"
+          },
+          "num_learners": {
+            "title": "Num Learners",
+            "type": "integer"
+          },
+          "total_required": {
+            "title": "Total Required",
+            "type": "number"
+          }
+        },
+        "required": [
+          "total_required",
+          "collected",
+          "balance",
+          "num_learners"
+        ],
+        "title": "FeeGroupSummary",
+        "type": "object"
+      },
+      "FeeRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "academic_year": {
+            "maximum": 2200.0,
+            "minimum": 0.0,
+            "title": "Academic Year",
+            "type": "integer"
+          },
+          "grade": {
+            "maxLength": 50,
+            "minLength": 1,
+            "title": "Grade",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "learner_id": {
+            "format": "uuid",
+            "title": "Learner Id",
+            "type": "string"
+          },
+          "learner_name": {
+            "title": "Learner Name",
+            "type": "string"
+          },
+          "lunch_fee": {
+            "title": "Lunch Fee",
+            "type": "number"
+          },
+          "lunch_required": {
+            "default": 0.0,
+            "minimum": 0.0,
+            "title": "Lunch Required",
+            "type": "number"
+          },
+          "pta_fee": {
+            "title": "Pta Fee",
+            "type": "number"
+          },
+          "pta_required": {
+            "default": 0.0,
+            "minimum": 0.0,
+            "title": "Pta Required",
+            "type": "number"
+          },
+          "remedials_fee": {
+            "title": "Remedials Fee",
+            "type": "number"
+          },
+          "remedials_required": {
+            "default": 0.0,
+            "minimum": 0.0,
+            "title": "Remedials Required",
+            "type": "number"
+          },
+          "school_fee": {
+            "title": "School Fee",
+            "type": "number"
+          },
+          "school_required": {
+            "default": 0.0,
+            "minimum": 0.0,
+            "title": "School Required",
+            "type": "number"
+          },
+          "term": {
+            "maximum": 3.0,
+            "minimum": 0.0,
+            "title": "Term",
+            "type": "integer"
+          },
+          "total_balance": {
+            "title": "Total Balance",
+            "type": "number"
+          },
+          "total_paid": {
+            "title": "Total Paid",
+            "type": "number"
+          },
+          "total_required": {
+            "title": "Total Required",
+            "type": "number"
+          },
+          "welfare_fee": {
+            "title": "Welfare Fee",
+            "type": "number"
+          },
+          "welfare_required": {
+            "default": 0.0,
+            "minimum": 0.0,
+            "title": "Welfare Required",
+            "type": "number"
+          }
+        },
+        "required": [
+          "learner_id",
+          "grade",
+          "id",
+          "learner_name",
+          "pta_fee",
+          "remedials_fee",
+          "welfare_fee",
+          "lunch_fee",
+          "school_fee",
+          "total_required",
+          "total_paid",
+          "total_balance"
+        ],
+        "title": "FeeRecord",
+        "type": "object"
+      },
+      "FeeSummaryAll": {
+        "properties": {
+          "total_balance": {
+            "title": "Total Balance",
+            "type": "number"
+          },
+          "total_learners": {
+            "title": "Total Learners",
+            "type": "integer"
+          },
+          "total_paid": {
+            "title": "Total Paid",
+            "type": "number"
+          },
+          "total_required": {
+            "title": "Total Required",
+            "type": "number"
+          }
+        },
+        "required": [
+          "total_learners",
+          "total_required",
+          "total_paid",
+          "total_balance"
+        ],
+        "title": "FeeSummaryAll",
+        "type": "object"
+      },
+      "GradeSummary": {
+        "properties": {
+          "average_class_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Class Score"
+          },
+          "num_learners": {
+            "title": "Num Learners",
+            "type": "integer"
+          },
+          "total_balance": {
+            "title": "Total Balance",
+            "type": "number"
+          },
+          "total_paid": {
+            "title": "Total Paid",
+            "type": "number"
+          },
+          "total_required": {
+            "title": "Total Required",
+            "type": "number"
+          }
+        },
+        "required": [
+          "num_learners",
+          "total_required",
+          "total_paid",
+          "total_balance",
+          "average_class_score"
+        ],
+        "title": "GradeSummary",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "LearnerCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "class_name": {
+            "maxLength": 50,
+            "minLength": 1,
+            "title": "Class Name",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "class_name"
+        ],
+        "title": "LearnerCreate",
+        "type": "object"
+      },
+      "LearnerPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LearnerRecord"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "LearnerPage",
+        "type": "object"
+      },
+      "LearnerRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "class_name": {
+            "maxLength": 50,
+            "minLength": 1,
+            "title": "Class Name",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "class_name",
+          "id",
+          "created_at"
+        ],
+        "title": "LearnerRecord",
+        "type": "object"
+      },
+      "LearnerReport": {
+        "properties": {
+          "academic_year": {
+            "title": "Academic Year",
+            "type": "integer"
+          },
+          "class_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Name"
+          },
+          "fees": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FeeRecord"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "learner_id": {
+            "format": "uuid",
+            "title": "Learner Id",
+            "type": "string"
+          },
+          "learner_name": {
+            "title": "Learner Name",
+            "type": "string"
+          },
+          "marks": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MarkRecord"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "term": {
+            "title": "Term",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "learner_id",
+          "learner_name",
+          "class_name",
+          "academic_year",
+          "term",
+          "marks",
+          "fees"
+        ],
+        "title": "LearnerReport",
+        "type": "object"
+      },
+      "LogoutResponse": {
+        "properties": {
+          "msg": {
+            "title": "Msg",
+            "type": "string"
+          }
+        },
+        "required": [
+          "msg"
+        ],
+        "title": "LogoutResponse",
+        "type": "object"
+      },
+      "MarkRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "academic_year": {
+            "title": "Academic Year",
+            "type": "integer"
+          },
+          "agriculture": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Agriculture",
+            "type": "number"
+          },
+          "average": {
+            "title": "Average",
+            "type": "number"
+          },
+          "class_name": {
+            "title": "Class Name",
+            "type": "string"
+          },
+          "cre": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Cre",
+            "type": "number"
+          },
+          "creative_arts": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Creative Arts",
+            "type": "number"
+          },
+          "english": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "English",
+            "type": "number"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "integrated_science": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Integrated Science",
+            "type": "number"
+          },
+          "kiswahili": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Kiswahili",
+            "type": "number"
+          },
+          "learner_id": {
+            "format": "uuid",
+            "title": "Learner Id",
+            "type": "string"
+          },
+          "mathematics": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Mathematics",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "pretechnical": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Pretechnical",
+            "type": "number"
+          },
+          "rank": {
+            "title": "Rank",
+            "type": "integer"
+          },
+          "social_studies": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Social Studies",
+            "type": "number"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "term": {
+            "title": "Term",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "number"
+          }
+        },
+        "required": [
+          "mathematics",
+          "pretechnical",
+          "cre",
+          "agriculture",
+          "integrated_science",
+          "social_studies",
+          "english",
+          "kiswahili",
+          "creative_arts",
+          "id",
+          "learner_id",
+          "name",
+          "class_name",
+          "academic_year",
+          "term",
+          "total",
+          "average",
+          "status",
+          "rank"
+        ],
+        "title": "MarkRecord",
+        "type": "object"
+      },
+      "MarksSaved": {
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/MarkRecord"
+            },
+            "title": "Results",
+            "type": "array"
+          }
+        },
+        "required": [
+          "message",
+          "results"
+        ],
+        "title": "MarksSaved",
+        "type": "object"
+      },
+      "MarksSubmission": {
+        "additionalProperties": false,
+        "properties": {
+          "students": {
+            "items": {
+              "$ref": "#/components/schemas/StudentMarks"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Students",
+            "type": "array"
+          }
+        },
+        "required": [
+          "students"
+        ],
+        "title": "MarksSubmission",
+        "type": "object"
+      },
+      "Monitoring": {
+        "properties": {
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "pending": {
+            "title": "Pending",
+            "type": "integer"
+          },
+          "succeeded": {
+            "title": "Succeeded",
+            "type": "integer"
+          },
+          "window_seconds": {
+            "title": "Window Seconds",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "window_seconds",
+          "failed",
+          "succeeded",
+          "pending"
+        ],
+        "title": "Monitoring",
+        "type": "object"
+      },
+      "Page_MarkRecord_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MarkRecord"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "Page[MarkRecord]",
+        "type": "object"
+      },
+      "Page_PaymentRecord_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PaymentRecord"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "Page[PaymentRecord]",
+        "type": "object"
+      },
+      "PaymentCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "exclusiveMinimum": 0.0,
+            "title": "Amount",
+            "type": "number"
+          },
+          "category": {
+            "enum": [
+              "pta",
+              "remedials",
+              "welfare",
+              "lunch",
+              "school"
+            ],
+            "title": "Category",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "payment_date": {
+            "format": "date",
+            "title": "Payment Date",
+            "type": "string"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          }
+        },
+        "required": [
+          "category",
+          "amount",
+          "payment_date"
+        ],
+        "title": "PaymentCreate",
+        "type": "object"
+      },
+      "PaymentRecord": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "number"
+          },
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "fee_id": {
+            "title": "Fee Id",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "is_opening_balance": {
+            "title": "Is Opening Balance",
+            "type": "boolean"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "payment_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Date"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          }
+        },
+        "required": [
+          "id",
+          "fee_id",
+          "category",
+          "amount",
+          "payment_date",
+          "reference",
+          "note",
+          "is_opening_balance"
+        ],
+        "title": "PaymentRecord",
+        "type": "object"
+      },
+      "RefreshRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "refresh_token": {
+            "maxLength": 256,
+            "minLength": 32,
+            "title": "Refresh Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "refresh_token"
+        ],
+        "title": "RefreshRequest",
+        "type": "object"
+      },
+      "ReportEntry": {
+        "properties": {
+          "fees": {
+            "$ref": "#/components/schemas/FeeRecord"
+          },
+          "grade": {
+            "title": "Grade",
+            "type": "string"
+          },
+          "learner_id": {
+            "format": "uuid",
+            "title": "Learner Id",
+            "type": "string"
+          },
+          "learner_name": {
+            "title": "Learner Name",
+            "type": "string"
+          },
+          "marks": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MarkRecord"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "learner_id",
+          "learner_name",
+          "grade",
+          "marks",
+          "fees"
+        ],
+        "title": "ReportEntry",
+        "type": "object"
+      },
+      "SchoolSummary": {
+        "properties": {
+          "average_school_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average School Score"
+          },
+          "total_balance": {
+            "title": "Total Balance",
+            "type": "number"
+          },
+          "total_learners": {
+            "title": "Total Learners",
+            "type": "integer"
+          },
+          "total_paid": {
+            "title": "Total Paid",
+            "type": "number"
+          },
+          "total_required": {
+            "title": "Total Required",
+            "type": "number"
+          }
+        },
+        "required": [
+          "total_learners",
+          "total_required",
+          "total_paid",
+          "total_balance",
+          "average_school_score"
+        ],
+        "title": "SchoolSummary",
+        "type": "object"
+      },
+      "SetupReminder": {
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "detail"
+        ],
+        "title": "SetupReminder",
+        "type": "object"
+      },
+      "StudentMarks": {
+        "additionalProperties": false,
+        "properties": {
+          "academic_year": {
+            "maximum": 2200.0,
+            "minimum": 2000.0,
+            "title": "Academic Year",
+            "type": "integer"
+          },
+          "agriculture": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Agriculture",
+            "type": "number"
+          },
+          "class_name": {
+            "maxLength": 50,
+            "minLength": 1,
+            "title": "Class Name",
+            "type": "string"
+          },
+          "cre": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Cre",
+            "type": "number"
+          },
+          "creative_arts": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Creative Arts",
+            "type": "number"
+          },
+          "english": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "English",
+            "type": "number"
+          },
+          "integrated_science": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Integrated Science",
+            "type": "number"
+          },
+          "kiswahili": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Kiswahili",
+            "type": "number"
+          },
+          "learner_id": {
+            "format": "uuid",
+            "title": "Learner Id",
+            "type": "string"
+          },
+          "mathematics": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Mathematics",
+            "type": "number"
+          },
+          "pretechnical": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Pretechnical",
+            "type": "number"
+          },
+          "social_studies": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Social Studies",
+            "type": "number"
+          },
+          "term": {
+            "maximum": 3.0,
+            "minimum": 1.0,
+            "title": "Term",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "mathematics",
+          "pretechnical",
+          "cre",
+          "agriculture",
+          "integrated_science",
+          "social_studies",
+          "english",
+          "kiswahili",
+          "creative_arts",
+          "learner_id",
+          "class_name",
+          "academic_year",
+          "term"
+        ],
+        "title": "StudentMarks",
+        "type": "object"
+      },
+      "TermInfo": {
+        "properties": {
+          "holiday_after": {
+            "title": "Holiday After",
+            "type": "string"
+          },
+          "holiday_after_weeks": {
+            "title": "Holiday After Weeks",
+            "type": "integer"
+          },
+          "instruction_weeks": {
+            "title": "Instruction Weeks",
+            "type": "integer"
+          },
+          "months": {
+            "title": "Months",
+            "type": "string"
+          },
+          "term": {
+            "title": "Term",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "term",
+          "months",
+          "instruction_weeks",
+          "holiday_after_weeks",
+          "holiday_after"
+        ],
+        "title": "TermInfo",
+        "type": "object"
+      },
+      "TokenResponse": {
+        "properties": {
+          "access_token": {
+            "title": "Access Token",
+            "type": "string"
+          },
+          "expires_in": {
+            "title": "Expires In",
+            "type": "integer"
+          },
+          "refresh_expires_at": {
+            "title": "Refresh Expires At",
+            "type": "integer"
+          },
+          "refresh_token": {
+            "title": "Refresh Token",
+            "type": "string"
+          },
+          "token_type": {
+            "const": "bearer",
+            "title": "Token Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token",
+          "refresh_token",
+          "token_type",
+          "expires_in",
+          "refresh_expires_at"
+        ],
+        "title": "TokenResponse",
+        "type": "object"
+      },
+      "UserCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "password": {
+            "maxLength": 1024,
+            "minLength": 12,
+            "title": "Password",
+            "type": "string"
+          },
+          "role": {
+            "const": "teacher",
+            "default": "teacher",
+            "title": "Role",
+            "type": "string"
+          },
+          "username": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^\\S(?:.*\\S)?$",
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "UserCreate",
+        "type": "object"
+      },
+      "UserRegistered": {
+        "properties": {
+          "msg": {
+            "title": "Msg",
+            "type": "string"
+          },
+          "role": {
+            "const": "teacher",
+            "title": "Role",
+            "type": "string"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "msg",
+          "username",
+          "role"
+        ],
+        "title": "UserRegistered",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "OAuth2PasswordBearer": {
+        "flows": {
+          "password": {
+            "scopes": {},
+            "tokenUrl": "/auth/token"
+          }
+        },
+        "type": "oauth2"
+      }
+    }
+  },
+  "info": {
+    "title": "Student Reports API",
+    "version": "2.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/admin/dashboard": {
+      "get": {
+        "operationId": "get_admin_dashboard",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDashboard"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Admin Dashboard",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/auth/accounts": {
+      "get": {
+        "operationId": "list_accounts",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AccountView"
+                  },
+                  "title": "Response List Accounts",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Accounts",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/accounts/{user_id}/status": {
+      "put": {
+        "operationId": "set_account_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "title": "User Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountStatus"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Account Status",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Logout",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/logout-refresh": {
+      "post": {
+        "operationId": "logout_refresh",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Logout Refresh",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/monitoring": {
+      "get": {
+        "operationId": "authentication_monitoring",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Monitoring"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Monitoring",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "operationId": "refresh_session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Refresh",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "operationId": "signup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRegistered"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Signup",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/token": {
+      "post": {
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_login"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Login",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/fees": {
+      "get": {
+        "operationId": "list_fees",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "academic_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Academic Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "term",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Term"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FeeRecord"
+                  },
+                  "title": "Response List Fees",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List Fees",
+        "tags": [
+          "Fees"
+        ]
+      },
+      "post": {
+        "operationId": "save_fee",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeeCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeeRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create Fee",
+        "tags": [
+          "Fees"
+        ]
+      }
+    },
+    "/fees/calendar": {
+      "get": {
+        "operationId": "get_academic_calendar",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcademicCalendar"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Academic Calendar",
+        "tags": [
+          "Fees"
+        ]
+      }
+    },
+    "/fees/category/{category}": {
+      "get": {
+        "operationId": "list_fees_by_category_fees_category__category__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "title": "Category",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "academic_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Academic Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "term",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Term"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FeeRecord"
+                  },
+                  "title": "Response List Fees By Category Fees Category  Category  Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List Fees By Category",
+        "tags": [
+          "Fees"
+        ]
+      }
+    },
+    "/fees/grade/{grade}": {
+      "get": {
+        "operationId": "list_fees_by_grade_fees_grade__grade__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "grade",
+            "required": true,
+            "schema": {
+              "title": "Grade",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "academic_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Academic Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "term",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Term"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FeeRecord"
+                  },
+                  "title": "Response List Fees By Grade Fees Grade  Grade  Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List Fees By Grade",
+        "tags": [
+          "Fees"
+        ]
+      }
+    },
+    "/fees/records/{fee_id}": {
+      "delete": {
+        "operationId": "delete_fee_fees_records__fee_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "fee_id",
+            "required": true,
+            "schema": {
+              "title": "Fee Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "academic_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Academic Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "term",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Term"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeeDeleted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Delete Fee",
+        "tags": [
+          "Fees"
+        ]
+      },
+      "put": {
+        "operationId": "update_fee_fees_records__fee_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "fee_id",
+            "required": true,
+            "schema": {
+              "title": "Fee Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeeCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeeRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update Fee",
+        "tags": [
+          "Fees"
+        ]
+      }
+    },
+    "/fees/records/{fee_id}/payments": {
+      "get": {
+        "operationId": "list_payments",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "fee_id",
+            "required": true,
+            "schema": {
+              "title": "Fee Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_PaymentRecord_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List Payments",
+        "tags": [
+          "Fees"
+        ]
+      },
+      "post": {
+        "operationId": "record_payment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "fee_id",
+            "required": true,
+            "schema": {
+              "title": "Fee Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Record Payment",
+        "tags": [
+          "Fees"
+        ]
+      }
+    },
+    "/fees/records/{fee_id}/statement.pdf": {
+      "get": {
+        "operationId": "download_fee_statement",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "fee_id",
+            "required": true,
+            "schema": {
+              "title": "Fee Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Fee Statement By Id",
+        "tags": [
+          "Fees"
+        ]
+      }
+    },
+    "/fees/summary/all": {
+      "get": {
+        "operationId": "fee_summary_all_fees_summary_all_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "academic_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Academic Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "term",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Term"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeeSummaryAll"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Fee Summary All",
+        "tags": [
+          "Fees"
+        ]
+      }
+    },
+    "/fees/summary/category/{category}": {
+      "get": {
+        "operationId": "fee_summary_by_category_fees_summary_category__category__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "title": "Category",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "academic_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Academic Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "term",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Term"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeeGroupSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Fee Summary By Category",
+        "tags": [
+          "Fees"
+        ]
+      }
+    },
+    "/fees/summary/grade/{grade}": {
+      "get": {
+        "operationId": "fee_summary_by_grade_fees_summary_grade__grade__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "grade",
+            "required": true,
+            "schema": {
+              "title": "Grade",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "academic_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Academic Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "term",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Term"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeeGroupSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Fee Summary By Grade",
+        "tags": [
+          "Fees"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health Check",
+        "tags": [
+          "Operations"
+        ]
+      }
+    },
+    "/learners": {
+      "get": {
+        "operationId": "list_learners",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 255,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "in": "query",
+            "name": "class_name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Class Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearnerPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List Learners",
+        "tags": [
+          "Learners"
+        ]
+      },
+      "post": {
+        "operationId": "create_learner",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LearnerCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearnerRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create Learner",
+        "tags": [
+          "Learners"
+        ]
+      }
+    },
+    "/learners/{learner_id}": {
+      "get": {
+        "operationId": "get_learner",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "learner_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Learner Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearnerRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get Learner",
+        "tags": [
+          "Learners"
+        ]
+      }
+    },
+    "/marks": {
+      "get": {
+        "operationId": "list_marks",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "academic_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Academic Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "term",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Term"
+            }
+          },
+          {
+            "in": "query",
+            "name": "class_name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Class Name"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_MarkRecord_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List Marks",
+        "tags": [
+          "Marks"
+        ]
+      }
+    },
+    "/marks/export": {
+      "get": {
+        "operationId": "download_marks_csv",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "academic_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Academic Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "term",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Term"
+            }
+          },
+          {
+            "in": "query",
+            "name": "class_name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Class Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Export Marks",
+        "tags": [
+          "Marks"
+        ]
+      }
+    },
+    "/marks/export/pdf": {
+      "get": {
+        "operationId": "download_marks_pdf",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "academic_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Academic Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "term",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Term"
+            }
+          },
+          {
+            "in": "query",
+            "name": "class_name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Class Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Export Marks Pdf",
+        "tags": [
+          "Marks"
+        ]
+      }
+    },
+    "/marks/submit": {
+      "post": {
+        "operationId": "submit_marks",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarksSubmission"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarksSaved"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Submit Marks",
+        "tags": [
+          "Marks"
+        ]
+      }
+    },
+    "/ready": {
+      "get": {
+        "operationId": "readiness",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Readiness",
+        "tags": [
+          "Operations"
+        ]
+      }
+    },
+    "/reports/dashboard": {
+      "get": {
+        "operationId": "get_dashboard_report",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "academic_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Academic Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "term",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Term"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "export",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(csv|pdf)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Export"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardReport"
+                }
+              },
+              "application/pdf": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              },
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "School Dashboard",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/reports/learner/{learner_id}": {
+      "get": {
+        "operationId": "get_learner_report",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "learner_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Learner Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "academic_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Academic Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "term",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Term"
+            }
+          },
+          {
+            "in": "query",
+            "name": "class_name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Class Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearnerReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Learner Report",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/reports/learner/{learner_id}/pdf": {
+      "get": {
+        "operationId": "download_learner_report",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "learner_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Learner Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "academic_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Academic Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "term",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Term"
+            }
+          },
+          {
+            "in": "query",
+            "name": "class_name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Class Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Learner Report Pdf",
+        "tags": [
+          "Reports"
+        ]
+      }
+    }
+  }
+}

@@ -28,3 +28,4 @@ exports/
 !requirements.txt
 !requirements-dev.txt
 learners.json
+.local/

@@ -14,7 +14,7 @@ def mount_frontend(app: FastAPI, build_path: Path) -> None:
     @app.get("/{full_path:path}", include_in_schema=False)
     async def serve_frontend(full_path: str):
         ui_routes = {"admin", "admin/finance"}
-        api_prefixes = {"auth", "marks", "fees", "reports", "admin", "health", "docs", "redoc", "openapi.json"}
+        api_prefixes = {"auth", "marks", "fees", "reports", "admin", "learners", "health", "ready", "docs", "redoc", "openapi.json"}
         if full_path not in ui_routes and full_path.split("/", 1)[0] in api_prefixes:
             raise HTTPException(status_code=404, detail="Not found")
         candidate = (build_path / full_path).resolve()

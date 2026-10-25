@@ -8,6 +8,7 @@ class Fee(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     learner_name = Column(String(255), index=True, nullable=False)
+    learner_id = Column(String(36), ForeignKey("learners.id"), index=True)
     grade = Column(String(50), index=True, nullable=False)
     academic_year = Column(Integer, index=True, nullable=False, default=0)
     term = Column(Integer, index=True, nullable=False, default=0)

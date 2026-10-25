@@ -11,7 +11,7 @@ class ReportSummary(BaseModel):
     total_fees: float
     total_balance: float
     subject_averages: Dict[str, float]
-    pdf_path: str
+
 
 
 class FeeBase(BaseModel):

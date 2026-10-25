@@ -19,6 +19,15 @@ class GradeCommentTests(unittest.TestCase):
         self.assertEqual(grade_comment(-1), "Invalid")
         self.assertEqual(grade_comment(101), "Invalid")
 
+    def test_fractional_rounding_and_non_finite_scores(self):
+        for score, expected in ((0, "BE2"), (0.01, "BE2"), (10.4, "BE2"), (10.6, "BE1"),
+                                (42.4, "AE1"), (42.6, "ME2"), (67.8, "EE2"), (90.6, "EE1"),
+                                (10.5, "BE2"), (53.5, "ME1")):
+            with self.subTest(score=score):
+                self.assertEqual(grade_comment(score), expected)
+        for score in (-0.1, 100.1, float("inf"), float("-inf"), float("nan")):
+            self.assertEqual(grade_comment(score), "Invalid")
+
 
 if __name__ == "__main__":
     unittest.main()

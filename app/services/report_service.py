@@ -1,8 +1,8 @@
 # app/services/report_service.py
-import os
+from io import BytesIO
 import pandas as pd
 import numpy as np
-from datetime import datetime
+
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
@@ -50,11 +50,12 @@ def compute_reports(df: pd.DataFrame):
     return df, grade_summary, subject_cols
 
 
-def generate_pdf_booklet(combined_df, subject_cols, output_file="Student_Report_Booklet.pdf"):
+def generate_pdf_booklet(combined_df, subject_cols):
     """
     Generate a PDF booklet with per-student pages and a summary page.
     """
-    c = canvas.Canvas(output_file, pagesize=A4)
+    output = BytesIO()
+    c = canvas.Canvas(output, pagesize=A4)
     width, height = A4
 
     for _, row in combined_df.iterrows():
@@ -104,7 +105,7 @@ def generate_pdf_booklet(combined_df, subject_cols, output_file="Student_Report_
 
     c.showPage()
     c.save()
-    return output_file
+    return output.getvalue()
 
 
 def generate_reports(performance_file, fees_file):
@@ -118,9 +119,9 @@ def generate_reports(performance_file, fees_file):
     combined_df = performance_df.merge(fees_df, on="Learner Name", how="inner")
     combined_df, grade_summary, subject_cols = compute_reports(combined_df)
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    pdf_file = f"Student_Report_Booklet_{timestamp}.pdf"
-    generate_pdf_booklet(combined_df, subject_cols, output_file=pdf_file)
+
+
+    pdf_bytes = generate_pdf_booklet(combined_df, subject_cols)
 
     subject_averages = {subj: round(float(combined_df[subj].mean()), 2) for subj in subject_cols}
 
@@ -132,12 +133,13 @@ def generate_reports(performance_file, fees_file):
         total_fees=round(float(combined_df["Fee Paid"].sum()), 2),
         total_balance=round(float(combined_df["Fee Balance"].sum()), 2),
         subject_averages=subject_averages,
-        pdf_path=pdf_file
+
     )
 
     return {
         "students": combined_df.to_dict(orient="records"),
         "grade_summary": grade_summary.to_dict(orient="records"),
+        "pdf": pdf_bytes,
         "summary": _last_summary
     }
 

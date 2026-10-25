@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel, field_validator
+from datetime import datetime, timezone
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -8,24 +10,67 @@ from app.models.admin_activity import AdminActivity
 from app.models.fee import Fee
 from app.models.marks import Marks
 from app.models.user import User
+from app.models.learner import Learner
 from app.utils.academic_calendar import TERM_SCHEDULE, current_academic_period
 
 router = APIRouter()
 
 
-@router.get("/dashboard")
+class SetupReminder(BaseModel):
+    id: str
+    title: str
+    detail: str
+
+
+class AcademicStatus(BaseModel):
+    students_with_marks: int
+    students_without_marks: int
+    mark_records: int
+    average_score: float | None
+
+
+class CurrentFeeSummary(BaseModel):
+    academic_year: int
+    term: int
+    learners_with_fee_records: int
+    expected: float
+    received: float
+    outstanding: float
+
+
+class ActivityRecord(BaseModel):
+    id: int
+    actor: str
+    action: str
+    description: str
+    created_at: datetime
+
+    @field_validator("created_at")
+    @classmethod
+    def utc_timestamp(cls, value):
+        return value.replace(tzinfo=timezone.utc) if value.tzinfo is None else value.astimezone(timezone.utc)
+
+
+class AdminDashboard(BaseModel):
+    academic_period: dict[str, str | int]
+    counts: dict[str, int]
+    setup_reminders: list[SetupReminder]
+    academic_status: AcademicStatus
+    fee_summary: CurrentFeeSummary
+    recent_activity: list[ActivityRecord]
+
+
+@router.get("/dashboard", response_model=AdminDashboard, operation_id="get_admin_dashboard")
 def admin_dashboard(db: Session = Depends(get_db), _admin=Depends(admin_only)):
     academic_year, term = current_academic_period()
 
-    student_names = db.query(Marks.name.label("name")).filter(Marks.name.isnot(None)).union(
-        db.query(Fee.learner_name.label("name"))
-    ).subquery()
-    student_count = db.query(func.count()).select_from(student_names).scalar() or 0
+    student_count = db.query(func.count(Learner.id)).scalar() or 0
     teacher_count = db.query(func.count(User.id)).filter(User.role == "teacher").scalar() or 0
 
-    marked_students = db.query(func.count(func.distinct(Marks.name))).filter(Marks.name.isnot(None)).scalar() or 0
-    marks_count = db.query(func.count(Marks.id)).scalar() or 0
-    average_score = db.query(func.avg(Marks.average)).filter(Marks.average.isnot(None)).scalar()
+    current_marks = db.query(Marks).filter(Marks.academic_year == academic_year, Marks.term == term)
+    marked_students = current_marks.with_entities(func.count(func.distinct(Marks.learner_id))).scalar() or 0
+    marks_count = current_marks.count()
+    average_score = current_marks.with_entities(func.avg(Marks.average)).scalar()
 
     current_fees = db.query(
         func.count(Fee.id),

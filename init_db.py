@@ -1,7 +1,7 @@
 """Initialize the app database and optionally create its first admin account."""
 import os
 
-from app.core.auth import pwd_context
+from app.core.passwords import hash_password
 from app.core.database import SessionLocal, init_db
 from app.models.user import User
 
@@ -15,18 +15,22 @@ if not admin_username and not admin_password:
 elif not admin_username or not admin_password:
     raise SystemExit("Set both INITIAL_ADMIN_USERNAME and INITIAL_ADMIN_PASSWORD.")
 else:
+    if len(admin_password) < 12:
+        raise SystemExit("Administrator password must contain at least 12 characters")
     db = SessionLocal()
     try:
         existing = db.query(User).filter(User.username == admin_username).first()
         if existing:
-            print(f"Admin account '{admin_username}' already exists; no password was changed.")
+            if existing.role != "admin":
+                raise SystemExit("Existing account is not an administrator")
+            print("Administrator account already exists; no password was changed.")
         else:
             db.add(User(
                 username=admin_username,
-                hashed_password=pwd_context.hash(admin_password),
+                hashed_password=hash_password(admin_password),
                 role="admin",
             ))
             db.commit()
-            print(f"Admin account '{admin_username}' created.")
+            print("Administrator account created.")
     finally:
         db.close()
