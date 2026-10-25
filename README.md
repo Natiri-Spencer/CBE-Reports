@@ -1,41 +1,57 @@
-# 📘 CBE Reports – Student Performance & Fee Management
+# CBE Reports API
 
-A FastAPI backend for generating **student performance reports** and **fee summaries**.  
-This tool helps teachers and administrators manage marks, fee payments, balances, and automatically generate individual reports and a consolidated PDF booklet.
+FastAPI service for teacher authentication, learner marks, CBC performance
+reports, fee records, payments, and PDF exports.
 
----
+## Requirements
 
-## 🚀 Features
-- Upload **performance** and **fees** data (CSV or JSON).
-- Merge datasets to produce a unified student record.
-- Automatically calculate:
-  - Subject totals
-  - Overall score
-  - Fee paid and balance
-  - Student status 
-- Generate:
-  - Individual text reports per student
-  - A consolidated PDF booklet with all student reports
-  - Summary statistics (averages, totals, at-risk count)
-- API endpoints for both **CSV upload** and **direct JSON entry** (teachers can key in marks & fees via frontend).
+- Python 3.11 or newer
+- SQLite for local development or PostgreSQL for deployment
 
----
+## Local setup
 
-## ⚙️ Installation & Setup
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements-dev.txt
+Copy-Item .env.example .env
+python init_db.py
+python -m uvicorn app.main:app --reload
+```
 
-1. Clone the repository:
-   ```bash
-   git clone git@github.com:Natiri-Spencer/CBE-Reports.git
-   cd CBE-Reports/student_reports_backend
+Set `INITIAL_ADMIN_USERNAME` and `INITIAL_ADMIN_PASSWORD` before running
+`init_db.py` to create the first administrator. Public signup creates teacher
+accounts only.
 
-## 🛠️ Tech Stack
+## Configuration
 
-- **FastAPI** → Modern Python web framework for building APIs  
-- **Pandas** → Data analysis and manipulation (merging CSVs, calculating averages)  
-- **NumPy** → Numerical computations and array operations  
-- **ReportLab** → PDF generation for student report booklets  
-- **CSV / JSON** → Supported input formats for student performance and fee data  
-- **Python 3.10+** → Core programming language powering the backend  
-- **Git & GitHub** → Version control and collaboration  
+- `ENV`: `DEV` or `PROD`
+- `JWT_SECRET_KEY`: required in production
+- `DATABASE_URL`: SQLAlchemy database URL
+- `CORS_ORIGINS`: comma-separated permitted frontend origins
 
+Production should use PostgreSQL, HTTPS, a long random JWT secret, and an
+explicit list of CORS origins.
 
+## Verification
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
+The test suite uses an isolated in-memory database. It does not modify the
+development database.
+
+The liveness endpoint is `GET /health`; API documentation is available at
+`/docs` in environments where documentation is enabled.
+
+## Repository structure
+
+The backend and frontend are maintained as two independent Git repositories.
+Clone this repository beside `student_reports_frontend`; do not initialize a
+third Git repository around both folders. The frontend repository is
+https://github.com/Natiri-Spencer/CBE-Reports-Frontend.git.
+
+Local databases, learner exports, generated reports, PDFs, and original learner
+lists are deliberately excluded from Git. Tests use anonymized data from
+`tests/fixtures`.

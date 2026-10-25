@@ -1,0 +1,11 @@
+fastapi==0.141.1
+uvicorn[standard]==0.53.0
+SQLAlchemy==2.0.54
+python-jose[cryptography]==3.5.0
+passlib[argon2]==1.7.4
+python-multipart==0.0.32
+email-validator==2.3.0
+pandas==3.0.6
+numpy==2.5.3
+reportlab==5.0.1
+psycopg[binary]>=3.2,<4

@@ -6,7 +6,8 @@ from datetime import datetime
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
-from app.models.schemas import ReportSummary, FeeSummary, StudentFeeRecord
+from app.models.schemas import ReportSummary, FeeSummary
+from app.services.grading import grade_comment
 
 _last_summary = None  # cache last summary
 
@@ -152,38 +153,8 @@ def generate_fee_summary(file) -> FeeSummary:
     df = pd.read_csv(file)
     df = calculate_fee_balances(df)
 
-    students = [
-        StudentFeeRecord(
-            learner_name=row["Learner Name"],
-            fee_paid=float(row["Fee Paid"]),
-            fee_balance=float(row["Fee Balance"])
-        )
-        for _, row in df.iterrows()
-    ]
-
     return FeeSummary(
         total_fees=float(df["Fee Paid"].sum()),
         total_balance=float(df["Fee Balance"].sum()),
-        students=students
+        students=df.to_dict(orient="records")  # return raw dicts instead of StudentFeeRecord
     )
-# Service functions for grading and comments
-
-def grade_comment(score: int) -> str:
-    if 0 <= score <= 9:
-        return "BE2"
-    elif 10 <= score <= 19:
-        return "BE1"
-    elif 20 <= score <= 29:
-        return "AE2"
-    elif 30 <= score <= 42:
-        return "AE1"
-    elif 43 <= score <= 56:
-        return "ME2"
-    elif 57 <= score <= 74:
-        return "ME1"
-    elif 75 <= score <= 89:
-        return "EE2"
-    elif 90 <= score <= 100:
-        return "EE1"
-    else:
-        return "Invalid"

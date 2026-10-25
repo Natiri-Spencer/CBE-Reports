@@ -1,0 +1,16 @@
+{
+  "students": [
+    {
+      "name": "Amina Test",
+      "mathematics": 80,
+      "pretechnical": 72,
+      "cre": 75,
+      "agriculture": 78,
+      "integrated_science": 82,
+      "social_studies": 76,
+      "english": 84,
+      "kiswahili": 79,
+      "creativeArts": 88
+    }
+  ]
+}

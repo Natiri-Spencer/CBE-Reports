@@ -1,32 +1,23 @@
+# routes/auth.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
-
-from app.core.auth import (
-    pwd_context,
-    authenticate_user,
-    create_access_token,
-    get_db,
-)
+from fastapi.security import OAuth2PasswordRequestForm
+from typing import Literal
+# routes/auth.py (top)
+from app.core.auth import pwd_context, authenticate_user, create_access_token
+from app.core.database import get_db
 from app.models.user import User
 
-# -------------------------------
-# Router (no prefix here)
-# -------------------------------
 router = APIRouter()
 
-# -------------------------------
-# Pydantic model for signup
-# -------------------------------
 class UserCreate(BaseModel):
     username: str
     password: str
-    role: str
+    role: Literal["teacher"] = "teacher"
 
-# -------------------------------
-# Signup
-# -------------------------------
+
+
 @router.post("/signup")
 def signup(user: UserCreate, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.username == user.username).first()
@@ -37,17 +28,18 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
     new_user = User(
         username=user.username,
         hashed_password=hashed_pw,
-        role=user.role
+        role="teacher"
     )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
 
-    return {"msg": "User created", "username": new_user.username, "role": new_user.role}
+    return {
+        "msg": "User created successfully",
+        "username": new_user.username,
+        "role": new_user.role
+    }
 
-# -------------------------------
-# Login
-# -------------------------------
 @router.post("/token")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(db, form_data.username, form_data.password)
@@ -57,10 +49,6 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     access_token = create_access_token(data={"sub": user.username, "role": user.role})
     return {"access_token": access_token, "token_type": "bearer"}
 
-# -------------------------------
-# Logout
-# -------------------------------
 @router.post("/logout")
 def logout():
-    # JWT logout is handled client-side by deleting the token
     return {"msg": "User logged out (delete token client-side)"}

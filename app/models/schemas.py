@@ -1,36 +1,76 @@
 # app/models/schemas.py
 
-from pydantic import BaseModel
-from typing import Dict, List
+from pydantic import BaseModel, EmailStr
+from typing import Dict, List, Any
 
 
 class ReportSummary(BaseModel):
-    """
-    Summary object for student performance and fee reports.
-    Returned by report_service after generating reports.
-    """
-    total_students: int          # Total number of students processed
-    at_risk: int                 # Number of students flagged as "At Risk"
-    avg_score: float             # Average total score across all students
-    total_fees: float            # Total fees collected
-    total_balance: float         # Total outstanding fee balance
-    subject_averages: Dict[str, float]  # Average score per subject
-    pdf_path: str                # Path to the generated PDF booklet
+    total_students: int
+    at_risk: int
+    avg_score: float
+    total_fees: float
+    total_balance: float
+    subject_averages: Dict[str, float]
+    pdf_path: str
 
 
-class StudentFeeRecord(BaseModel):
-    """
-    Individual student fee record.
-    """
+class FeeBase(BaseModel):
     learner_name: str
-    fee_paid: float
-    fee_balance: float
+    grade: str
+    pta_required: float
+    pta_fee: float
+    remedials_required: float
+    remedials_fee: float
+    welfare_required: float
+    welfare_fee: float
+    lunch_required: float
+    lunch_fee: float
+    school_required: float
+    school_fee: float
+
+
+class FeeCreate(FeeBase):
+    pass
+
+
+class FeeUpdate(FeeBase):
+    pass
+
+
+class Fee(FeeBase):
+    total_paid: float
+    total_balance: float
+
+    class Config:
+        from_attributes = True  # Pydantic v2
 
 
 class FeeSummary(BaseModel):
-    """
-    Admin-only fee summary response.
-    """
     total_fees: float
     total_balance: float
-    students: List[StudentFeeRecord]
+    students: List[Dict[str, Any]]
+
+
+# -------------------------------
+# ✅ Auth Schemas
+# -------------------------------
+
+class UserBase(BaseModel):
+    username: str
+    email: EmailStr
+
+
+class UserCreate(UserBase):
+    password: str
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
+class User(UserBase):
+    id: int
+
+    class Config:
+        from_attributes = True
